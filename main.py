@@ -1,9 +1,14 @@
 import psycopg2
 import json
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 # Start the API
 app: FastAPI = FastAPI()
+
+# Define who can access the API
+origins = ['*']
+app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=['GET'], allow_headers=[])
 
 # Load configuration
 with open('config.json', 'r') as handle:
@@ -75,8 +80,11 @@ def get_data_by_name(name: str) -> list:
     """
     Function fetching data based on the provided IDT
     """
-    # Check if the name is numeric
-    if name.isnumeric():
+    # Clean the name
+    name = name.replace('.', ' ').replace('_', ' ').title()
+
+    # Validate the name
+    if (len(name) == 0) or name.isnumeric():
         return []
     
     # Fetch the data
