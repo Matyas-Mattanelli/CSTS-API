@@ -35,7 +35,7 @@ ORDER BY e.date
 
 # Define the path operation
 @app.get('/IDT/{IDT}')
-def get_data(IDT: str) -> list:
+def get_data_by_IDT(IDT: str) -> list:
     """
     Function fetching data based on the provided IDT
     """
@@ -45,6 +45,42 @@ def get_data(IDT: str) -> list:
     
     # Fetch the data
     cursor.execute(query_IDT, (IDT, IDT))
+    records: list[tuple] = cursor.fetchall()
+
+    return records
+
+### Get data based on name ###
+
+# Define the query
+query_name: str = """
+SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+FROM competitionresults cr JOIN
+dancers d ON d.idt=cr.idt JOIN
+competitions c ON cr.comp_id=c.comp_id JOIN
+events e ON e.event_id=c.event_id LEFT JOIN
+competitionresults cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
+dancers d2 ON (cr2.idt=d2.idt)
+WHERE d.name=%s
+OR d.idt IN
+(SELECT DISTINCT idt FROM dancers
+WHERE d.name=%s)
+ORDER BY e.date
+"""
+
+# Define the path operation
+@app.get('/name/{name}')
+def get_data_by_name(name: str) -> list:
+    """
+    Function fetching data based on the provided IDT
+    """
+    # Check if the name is numeric
+    if name.isnumeric():
+        return []
+    
+    # Fetch the data
+    cursor.execute(query_name, (name, name))
     records: list[tuple] = cursor.fetchall()
 
     return records
