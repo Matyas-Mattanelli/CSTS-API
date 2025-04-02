@@ -23,8 +23,8 @@ cursor = connection.cursor()
 # Define the query
 query_IDT: str = """
 SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competitionresults cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
@@ -59,8 +59,8 @@ def get_data_by_IDT(IDT: str) -> list:
 # Define the query
 query_name: str = """
 SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competitionresults cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
