@@ -15,8 +15,15 @@ function buildTable(data) {
         // Indicate that the results are displayed
         divMsg.textContent = `Zobrazuji výsledky pro ${input.value}`;
 
+        // Destroy the table if it exists
+        const currentTable = document.querySelector("table");
+        if (currentTable != null) {
+            currentTable.remove();
+        }
+
         // Create a table to store the results
         const table = document.createElement("table");
+        table.className = "school"
         const headerRow = document.createElement("tr"); // Create a header row
 
         // Add the headers

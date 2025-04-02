@@ -2,14 +2,18 @@
 <html lang="cs">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Databáze ČSTS</title>
-    <!-- <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script> -->
   </head>
   <body>
-    <div>
+    <h1 class="width">Databáze ČSTS</h1>
+    <div class="width description">
+      Zadejte jméno nebo IDT
+    </div>
+    <div class="width">
         <input type="text" id="input" name="input" minlength="1" maxlength="50">
-        <button type="button" onclick="showResults()">Vyhledat</button>
+        <button type="button" id="submit" onclick="showResults()">Vyhledat</button>
     </div>
     <div id="results">
         <div id="msg"></div>

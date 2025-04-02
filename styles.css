@@ -1,0 +1,57 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+.width {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 800px;
+}
+
+.description {
+    text-align: center;
+}
+
+#input {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-top: 30px;
+}
+
+#submit {
+    width: 20%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+}
+
+#msg {
+    text-align: center;
+}
+
+#results {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 90vh;
+}
+
+table, th, td {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding: 5px;
+    text-align: center;
+}
+
+th {
+    background-color: white;
+    color: black;
+}
