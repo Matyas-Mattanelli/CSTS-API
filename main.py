@@ -23,13 +23,13 @@ cursor = connection.cursor()
 # Define the query
 query_IDT: str = """
 SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
 SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
-FROM competitionresults cr JOIN
+FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
 events e ON e.event_id=c.event_id LEFT JOIN
-competitionresults cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
+competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
 dancers d2 ON (cr2.idt=d2.idt)
 WHERE cr.idt=%s
 OR d.name IN
@@ -59,13 +59,13 @@ def get_data_by_IDT(IDT: str) -> list:
 # Define the query
 query_name: str = """
 SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
 SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
-FROM competitionresults cr JOIN
+FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
 events e ON e.event_id=c.event_id LEFT JOIN
-competitionresults cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
+competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
 dancers d2 ON (cr2.idt=d2.idt)
 WHERE d.name=%s
 OR d.idt IN

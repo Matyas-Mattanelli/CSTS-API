@@ -6,7 +6,7 @@ const divMsg = document.getElementById("msg");
 const input = document.getElementById("input");
 
 // Specify the headers for the table with results
-const columns = ["IDT", "Jméno", "Klub", "Stát", "Partner/ka", "ID soutěže", "ID eventu", "Typ", "Věková skupina", "Třída", "Disciplína", "Kategorie", "Datum", "Jméno eventu", "Pozice", "Body", "Finále", "Celkem body", "Celkem finále"];
+const columns = ["IDT", "Jméno", "Klub", "Stát", "Partner/ka", "ID soutěže", "ID eventu", "Typ", "Věková skupina", "Třída", "Disciplína", "Kategorie", "Datum", "Jméno eventu", "Pozice", "Počet účastníků", "Body", "Finále", "Celkem body", "Celkem finále"];
 
 // Define a function building a table from the given data
 function buildTable(data) {
