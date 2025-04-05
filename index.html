@@ -8,15 +8,18 @@
   </head>
   <body>
     <h1 class="width">Databáze ČSTS</h1>
-    <div class="width description">
-      Zadejte jméno nebo IDT
-    </div>
-    <div class="width">
+    <div class="width input">
+        <div class="description">
+          Zadejte jméno nebo IDT
+        </div>
         <input type="text" id="input" name="input" minlength="1" maxlength="50">
-        <button type="button" id="submit" onclick="showResults()">Vyhledat</button>
+        <button type="button" id="submit" onclick="showResults()" class="btn">Vyhledat</button>
+        <div id="msg" class="description"></div>
+        <button type="button" id="show-filters" onclick="showFilters()" class="btn">Show filters</button>
+        <div id="filters" class="width" style="display: none;">
+        </div>
     </div>
     <div id="results">
-        <div id="msg"></div>
     </div>
     <script src="script.js"></script>
   </body>
