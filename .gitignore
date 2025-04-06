@@ -3,3 +3,4 @@ config.json
 dtb_schema.png
 sql scripts
 __pycache__
+*.bat
