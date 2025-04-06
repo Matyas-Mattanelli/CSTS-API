@@ -44,6 +44,9 @@ def get_data_by_IDT(IDT: str) -> list:
     """
     Function fetching data based on the provided IDT
     """
+    # Strip trailing spaces
+    IDT = IDT.strip()
+
     # Check that IDT is numeric
     if not IDT.isnumeric():
         return []
@@ -81,7 +84,7 @@ def get_data_by_name(name: str) -> list:
     Function fetching data based on the provided IDT
     """
     # Clean the name
-    name = name.replace('.', ' ').replace('_', ' ').title()
+    name = name.strip().replace('.', ' ').replace('_', ' ').title()
 
     # Validate the name
     if (len(name) == 0) or name.isnumeric():
