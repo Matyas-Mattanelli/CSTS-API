@@ -6,13 +6,12 @@ from fastapi.middleware.cors import CORSMiddleware
 # Start the API
 app: FastAPI = FastAPI()
 
-# Define who can access the API
-origins = ['*']
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=False, allow_methods=['GET'], allow_headers=[])
-
 # Load configuration
 with open('config.json', 'r') as handle:
     config: dict = json.load(handle)
+
+# Define who can access the API
+app.add_middleware(CORSMiddleware, allow_origins=config['origins'], allow_credentials=False, allow_methods=['GET'], allow_headers=[])
 
 # Connect to the databasse
 connection = psycopg2.connect(database=config['database'], user=config['user'], password=config['password'], host=config['host'], port=int(config['port']))
