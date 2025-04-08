@@ -38,7 +38,7 @@ ORDER BY e.date
 """
 
 # Define the path operation
-@app.get('/IDT/{IDT}')
+@app.get(f'{config["api_path"]}/IDT/{{IDT}}')
 def get_data_by_IDT(IDT: str) -> list:
     """
     Function fetching data based on the provided IDT
@@ -77,7 +77,7 @@ ORDER BY e.date
 """
 
 # Define the path operation
-@app.get('/name/{name}')
+@app.get(f'{config["api_path"]}/name/{{name}}')
 def get_data_by_name(name: str) -> list:
     """
     Function fetching data based on the provided IDT
