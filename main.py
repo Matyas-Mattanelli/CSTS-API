@@ -3,12 +3,12 @@ import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Start the API
-app: FastAPI = FastAPI()
-
 # Load configuration
 with open('config.json', 'r') as handle:
     config: dict = json.load(handle)
+
+# Start the API
+app: FastAPI = FastAPI(docs_url=config["docs_url"], redoc_url=config["redoc_url"])
 
 # Define who can access the API
 app.add_middleware(CORSMiddleware, allow_origins=config['origins'], allow_credentials=False, allow_methods=['GET'], allow_headers=[])
