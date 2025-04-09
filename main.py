@@ -31,6 +31,21 @@ events e ON e.event_id=c.event_id LEFT JOIN
 competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
 dancers d2 ON (cr2.idt=d2.idt)
 WHERE cr.idt=%s
+ORDER BY e.date
+"""
+
+# Define an advanced version of the query (also including all names associated with the IDT even though they may have a different IDT)
+query_IDT_advanced: str = """
+SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+FROM competition_results cr JOIN
+dancers d ON d.idt=cr.idt JOIN
+competitions c ON cr.comp_id=c.comp_id JOIN
+events e ON e.event_id=c.event_id LEFT JOIN
+competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
+dancers d2 ON (cr2.idt=d2.idt)
+WHERE cr.idt=%s
 OR d.name IN
 (SELECT DISTINCT name FROM dancers
 WHERE idt=%s)
@@ -39,7 +54,7 @@ ORDER BY e.date
 
 # Define the path operation
 @app.get(f'{config["api_path"]}/IDT/{{IDT}}')
-def get_data_by_IDT(IDT: str) -> list:
+def get_data_by_IDT(IDT: str, advanced: bool = False) -> list:
     """
     Function fetching data based on the provided IDT
     """
@@ -51,7 +66,10 @@ def get_data_by_IDT(IDT: str) -> list:
         return []
     
     # Fetch the data
-    cursor.execute(query_IDT, (IDT, IDT))
+    if advanced:
+        cursor.execute(query_IDT_advanced, (IDT, IDT))
+    else:
+        cursor.execute(query_IDT, (IDT,))
     records: list[tuple] = cursor.fetchall()
 
     return records
@@ -70,6 +88,21 @@ events e ON e.event_id=c.event_id LEFT JOIN
 competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
 dancers d2 ON (cr2.idt=d2.idt)
 WHERE d.name=%s
+ORDER BY e.date
+"""
+
+# Define an advanced version of the query (also including all IDTs associated with the query even when they do not have the same name)
+query_name_advanced: str = """
+SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+FROM competition_results cr JOIN
+dancers d ON d.idt=cr.idt JOIN
+competitions c ON cr.comp_id=c.comp_id JOIN
+events e ON e.event_id=c.event_id LEFT JOIN
+competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
+dancers d2 ON (cr2.idt=d2.idt)
+WHERE d.name=%s
 OR d.idt IN
 (SELECT DISTINCT idt FROM dancers
 WHERE d.name=%s)
@@ -78,7 +111,7 @@ ORDER BY e.date
 
 # Define the path operation
 @app.get(f'{config["api_path"]}/name/{{name}}')
-def get_data_by_name(name: str) -> list:
+def get_data_by_name(name: str, advanced: bool = False) -> list:
     """
     Function fetching data based on the provided IDT
     """
@@ -90,13 +123,19 @@ def get_data_by_name(name: str) -> list:
         return []
     
     # Fetch the data
-    cursor.execute(query_name, (name, name))
+    if advanced:
+        cursor.execute(query_name_advanced, (name, name))
+    else:
+        cursor.execute(query_name, (name,))
     records: list[tuple] = cursor.fetchall()
 
     # Try reversing the name
     if len(records) == 0:
         name = ' '.join(name.rsplit(' ', 1)[::-1])
-        cursor.execute(query_name, (name, name))
+        if advanced:
+            cursor.execute(query_name_advanced, (name, name))
+        else:
+            cursor.execute(query_name, (name,))
         records = cursor.fetchall()
 
     return records
