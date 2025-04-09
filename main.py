@@ -93,4 +93,10 @@ def get_data_by_name(name: str) -> list:
     cursor.execute(query_name, (name, name))
     records: list[tuple] = cursor.fetchall()
 
+    # Try reversing the name
+    if len(records) == 0:
+        name = ' '.join(name.rsplit(' ', 1)[::-1])
+        cursor.execute(query_name, (name, name))
+        records = cursor.fetchall()
+
     return records
