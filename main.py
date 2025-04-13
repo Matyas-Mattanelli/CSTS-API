@@ -21,9 +21,9 @@ cursor = connection.cursor()
 
 # Define the query
 query_IDT: str = """
-SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
@@ -36,9 +36,9 @@ ORDER BY e.date
 
 # Define an advanced version of the query (also including all names associated with the IDT even though they may have a different IDT)
 query_IDT_advanced: str = """
-SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
@@ -78,9 +78,9 @@ def get_data_by_IDT(IDT: str, advanced: bool = False) -> list:
 
 # Define the query
 query_name: str = """
-SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
@@ -93,9 +93,9 @@ ORDER BY e.date
 
 # Define an advanced version of the query (also including all IDTs associated with the query even when they do not have the same name)
 query_name_advanced: str = """
-SELECT d.idt, d.name, cr.club, cr.country, d2.name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.name, c.type, c.age_group, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
+SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
+SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competition_results cr JOIN
 dancers d ON d.idt=cr.idt JOIN
 competitions c ON cr.comp_id=c.comp_id JOIN
