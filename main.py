@@ -21,7 +21,7 @@ cursor = connection.cursor()
 
 # Define the base query
 query_base: str = """
-SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
+SELECT DISTINCT DATE_PART('year', e.date) AS year, DATE_PART('month', e.date) as month, e.date, d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.name,
 cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
 SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
 FROM competition_results cr JOIN
