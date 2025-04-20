@@ -19,8 +19,8 @@ cursor = connection.cursor()
 
 ### Get data based on IDT ###
 
-# Define the query
-query_IDT: str = """
+# Define the base query
+query_base: str = """
 SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
 cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
 SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
@@ -30,27 +30,27 @@ competitions c ON cr.comp_id=c.comp_id JOIN
 events e ON e.event_id=c.event_id LEFT JOIN
 competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
 dancers d2 ON (cr2.idt=d2.idt)
+"""
+
+# Define the condition
+query_condition_IDT: str = """
 WHERE cr.idt=%s
+"""
+
+# Define the ordering
+query_order: str = """
 ORDER BY e.date
 """
 
+# Define the simple query for IDT
+query_IDT: str = query_base + query_condition_IDT + query_order
+
 # Define an advanced version of the query (also including all names associated with the IDT even though they may have a different IDT)
-query_IDT_advanced: str = """
-SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
-FROM competition_results cr JOIN
-dancers d ON d.idt=cr.idt JOIN
-competitions c ON cr.comp_id=c.comp_id JOIN
-events e ON e.event_id=c.event_id LEFT JOIN
-competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
-dancers d2 ON (cr2.idt=d2.idt)
-WHERE cr.idt=%s
+query_IDT_advanced: str = query_base + query_condition_IDT + """
 OR d.name IN
 (SELECT DISTINCT name FROM dancers
 WHERE idt=%s)
-ORDER BY e.date
-"""
+""" + query_order
 
 # Define the path operation
 @app.get(f'{config["api_path"]}/IDT/{{IDT}}')
@@ -76,38 +76,20 @@ def get_data_by_IDT(IDT: str, advanced: bool = False) -> list:
 
 ### Get data based on name ###
 
-# Define the query
-query_name: str = """
-SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
-FROM competition_results cr JOIN
-dancers d ON d.idt=cr.idt JOIN
-competitions c ON cr.comp_id=c.comp_id JOIN
-events e ON e.event_id=c.event_id LEFT JOIN
-competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
-dancers d2 ON (cr2.idt=d2.idt)
+# Define the condition
+query_condition_name: str = """
 WHERE d.name=%s
-ORDER BY e.date
 """
 
+# Define the simple query for name
+query_name: str = query_base + query_condition_name + query_order
+
 # Define an advanced version of the query (also including all IDTs associated with the query even when they do not have the same name)
-query_name_advanced: str = """
-SELECT DISTINCT d.idt, d.name, cr.club, cr.country, d2.main_name AS partner, c.comp_id, c.event_id, c.type, c.age_group, c.rank, c.discipline, c.category, e.date, e.name,
-cr.position, c.n_participants, cr.points, cr.final, SUM(cr.points) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_points,
-SUM(CAST(cr.final AS INT)) OVER (PARTITION BY cr.idt, d2.main_name, c.type, c.rank, c.discipline ORDER BY e.date) AS cumulative_finals
-FROM competition_results cr JOIN
-dancers d ON d.idt=cr.idt JOIN
-competitions c ON cr.comp_id=c.comp_id JOIN
-events e ON e.event_id=c.event_id LEFT JOIN
-competition_results cr2 ON (cr2.comp_id=cr.comp_id AND cr2.couple_id=cr.couple_id AND cr.idt<>cr2.idt) LEFT JOIN
-dancers d2 ON (cr2.idt=d2.idt)
-WHERE d.name=%s
+query_name_advanced: str = query_base + query_condition_name + """
 OR d.idt IN
 (SELECT DISTINCT idt FROM dancers
 WHERE d.name=%s)
-ORDER BY e.date
-"""
+""" + query_order
 
 # Define the path operation
 @app.get(f'{config["api_path"]}/name/{{name}}')
