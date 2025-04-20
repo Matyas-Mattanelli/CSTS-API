@@ -39,7 +39,7 @@ WHERE cr.idt=%s
 
 # Define the ordering
 query_order: str = """
-ORDER BY e.date
+ORDER BY e.date DESC
 """
 
 # Define the simple query for IDT
